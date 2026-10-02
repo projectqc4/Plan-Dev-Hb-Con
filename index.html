@@ -1,0 +1,575 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;}
+body{margin:0;background:#f0f2f5;color:#1a1a2e;}
+header{background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;padding:18px 24px;}
+h1{margin:0;font-size:22px;} header p{margin:4px 0;opacity:.85;font-size:13px;}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 24px;background:#fff;border-bottom:1px solid #e0e0e0;}
+label{font-size:12.5px;font-weight:600;}
+select,input[type=file],input[type=text],button{padding:7px 10px;border:1px solid #ccc;border-radius:8px;font-size:13px;}
+button{background:#2a5298;color:#fff;border:none;cursor:pointer;}
+button:hover{opacity:.9;}
+.reset{background:#c62828;}
+.ms-wrap{position:relative;display:inline-block;}
+.ms-box{min-width:150px;max-width:215px;border:1px solid #ccc;border-radius:8px;padding:7px 10px;font-size:13px;background:#fff;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ms-drop{display:none;position:absolute;z-index:60;background:#fff;border:1px solid #ddd;border-radius:10px;max-height:280px;overflow:auto;min-width:240px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:6px;}
+.ms-drop.open{display:block;}
+.ms-drop label{display:flex;gap:8px;align-items:center;padding:5px 8px;font-weight:400;cursor:pointer;border-radius:6px;font-size:12px;}
+.ms-drop label:hover{background:#eef4ff;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:18px;padding:24px;}
+.card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;}
+.card h3{margin:0 0 12px;font-size:15px;color:#1e3c72;padding-right:44px;}
+.card-export{position:absolute;top:14px;right:14px;padding:4px 8px;font-size:12px;border-radius:6px;}
+.hintbox{font-size:12px;color:#666;background:#f7f9fc;border-left:3px solid #2a5298;padding:8px 10px;border-radius:6px;margin-bottom:10px;}
+.kpi-row{display:flex;flex-wrap:wrap;gap:10px;}
+.kpi{flex:1;min-width:120px;background:#f7f9fc;border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:.15s;}
+.kpi:hover{background:#e8f0fe;transform:translateY(-2px);}
+.kpi .num{font-size:22px;font-weight:700;color:#2a5298;}
+.kpi .lbl{font-size:12px;color:#666;margin-top:4px;}
+.delta{font-size:12px;margin-top:4px;font-weight:600;}
+.up{color:#2e7d32;}.down{color:#c62828;}.flat{color:#888;}
+.bigkpi{display:flex;flex-wrap:wrap;gap:14px;}
+.bigkpi .b{flex:1;min-width:145px;background:linear-gradient(135deg,#1e3c72,#2a5298);color:#fff;border-radius:12px;padding:16px;cursor:pointer;transition:.15s;}
+.bigkpi .b:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2);}
+.bigkpi .b.gray{background:linear-gradient(135deg,#546e7a,#78909c);}
+.bigkpi .n{font-size:22px;font-weight:700;}
+.bigkpi .t{font-size:12px;opacity:.9;margin-top:4px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:8px;border-bottom:1px solid #eee;text-align:center;}
+th{background:#f0f4fa;}
+.full{grid-column:1/-1;}
+.empty{padding:40px;text-align:center;color:#888;}
+tr.clk{cursor:pointer;} tr.clk:hover{background:#eef4ff;}
+td[data-s]{cursor:pointer;} td[data-s]:hover{background:#dce9ff;font-weight:700;}
+.card-btn{background:#2e7d32;font-size:12px;padding:6px 10px;border-radius:8px;margin-bottom:10px;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;align-items:center;justify-content:center;}
+.modal{background:#fff;border-radius:14px;max-width:95vw;max-height:88vh;overflow:auto;padding:20px;}
+.modal h3{margin-top:0;color:#1e3c72;}
+.mtable{font-size:12px;white-space:nowrap;}
+.mtable td,.mtable th{text-align:left;padding:6px 10px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;}
+.close-x{background:#555;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Executive Dashboard – วิเคราะห์ลูกค้าและสินค้า</h1>
+  <p>อัปโหลดไฟล์ Excel → กรองข้อมูล → คลิก KPI / กราฟ / ตาราง เพื่อดูรายละเอียด และส่งออก Excel / รูปภาพ</p>
+</header>
+
+<div class="toolbar">
+  <input type="file" id="fileInput" accept=".xlsx,.xls">
+
+  <label>ภาค:</label>
+  <select id="regionFilter"><option value="ALL">ทั้งหมด</option></select>
+
+  <label>จังหวัด:</label>
+  <div class="ms-wrap"><div class="ms-box" id="provBox" onclick="toggleDrop(event,'provDrop')">ทุกจังหวัด</div><div class="ms-drop" id="provDrop"></div></div>
+
+  <label>Customer Group:</label>
+  <div class="ms-wrap"><div class="ms-box" id="groupBox" onclick="toggleDrop(event,'groupDrop')">ทุกกลุ่ม</div><div class="ms-drop" id="groupDrop"></div></div>
+
+  <label>ค้นหา BPName:</label><input type="text" id="bpSearch" placeholder="พิมพ์ชื่อ / BPNO...">
+
+  <label>สินค้า:</label>
+  <div class="ms-wrap"><div class="ms-box" id="prodBox" onclick="toggleDrop(event,'prodDrop')">ทุกสินค้า</div><div class="ms-drop" id="prodDrop"></div></div>
+
+  <label>Status (In/In Progress):</label><select id="statusFilter"><option value="ALL">ทั้งหมด</option></select>
+  <label>Status Project:</label><select id="statusProjFilter"><option value="ALL">ทั้งหมด</option></select>
+  <label>Product Spec (เดิม):</label><select id="specFilter"><option value="ALL">ทั้งหมด</option></select>
+  <label>Product (นำเสนอ):</label><select id="prodNewFilter"><option value="ALL">ทั้งหมด</option></select>
+  <label>Sale Status:</label><select id="saleFilter"><option value="ALL">ทั้งหมด</option></select>
+
+  <!-- ★ Plan : multi-select -->
+  <label>Plan:</label>
+  <div class="ms-wrap"><div class="ms-box" id="planBox" onclick="toggleDrop(event,'planDrop')">ทุก Plan</div><div class="ms-drop" id="planDrop"></div></div>
+
+  <label>เดือนปัจจุบัน:</label><select id="curMonth"></select>
+  <label>เดือนก่อน:</label><select id="prevMonth"></select>
+  <label>ปีปัจจุบัน:</label><select id="curYear"></select>
+  <label>ปีก่อน:</label><select id="prevYear"></select>
+
+  <button class="reset" onclick="resetFilters()">♻️ ล้างตัวกรอง</button>
+  <button onclick="exportImage()">🖼️ ส่งออกทั้งหน้า</button>
+</div>
+
+<div class="empty" id="hint">กรุณาอัปโหลดไฟล์ Excel เพื่อเริ่มแสดงผล</div>
+
+<div class="grid" id="dashboard" style="display:none;">
+
+  <div class="card full" data-name="ExecSummary"><button class="card-export" onclick="exportCard(this)">📷</button>
+    <h3>📌 สรุปภาพรวมสำหรับผู้บริหาร <small>(คลิกการ์ดดูรายละเอียด)</small></h3>
+    <div class="hintbox">นับ <b>In</b> / <b>In Progress</b> จาก Status และ Status Project · <b>ไม่ระบุสถานะ</b> = ไม่มีค่าทั้งสองคอลัมน์</div>
+    <div id="bigkpi" class="bigkpi"></div></div>
+
+  <div class="card full" data-name="ProductSales"><button class="card-export" onclick="exportCard(this)">📷</button>
+    <h3>ยอดขายรวมแยกตามสินค้า <small>(คลิกกราฟดูรายละเอียด)</small></h3>
+    <button class="card-btn" onclick="exportProdExcel()">⬇️ Excel (สรุปสินค้า)</button>
+    <canvas id="chartProducts" height="110"></canvas></div>
+
+  <div class="card" data-name="ProductGroup"><button class="card-export" onclick="exportCard(this)">📷</button><h3>สัดส่วนสินค้า (Top 8) แยกตาม Customer Group</h3><canvas id="chartProdGroup"></canvas></div>
+  <div class="card" data-name="ProductRegion"><button class="card-export" onclick="exportCard(this)">📷</button><h3>สัดส่วนสินค้า (Top 8) แยกตามภาค</h3><canvas id="chartProdRegion"></canvas></div>
+  <div class="card" data-name="RegionSales"><button class="card-export" onclick="exportCard(this)">📷</button><h3>ยอดขายรวมแยกตามภาค <small>(คลิกกราฟ)</small></h3><canvas id="chartRegionSales"></canvas></div>
+  <div class="card" data-name="GroupSales"><button class="card-export" onclick="exportCard(this)">📷</button><h3>ยอดขายรวมแยกตาม Customer Group <small>(คลิกกราฟ)</small></h3><canvas id="chartGroupSales"></canvas></div>
+
+  <div class="card full" data-name="1.1"><button class="card-export" onclick="exportCard(this)">📷</button><h3>1.1 จำนวน Customer Group (In/In Progress) เทียบเดือนก่อน <small>(คลิก KPI)</small></h3><div id="kpi11" class="kpi-row"></div></div>
+  <div class="card" data-name="1.2"><button class="card-export" onclick="exportCard(this)">📷</button><h3>1.2 % เปลี่ยนแปลงเทียบเดือนก่อน</h3><canvas id="chart12"></canvas></div>
+  <div class="card" data-name="1.3"><button class="card-export" onclick="exportCard(this)">📷</button><h3>1.3 เดือนก่อน / เดือนปัจจุบัน <small>(คลิกกราฟ)</small></h3><canvas id="chart13"></canvas></div>
+  <div class="card" data-name="1.4"><button class="card-export" onclick="exportCard(this)">📷</button><h3>1.4 สัดส่วน % (เดือนปัจจุบัน)</h3><canvas id="chart14"></canvas></div>
+
+  <div class="card full" data-name="YoY-KPI"><button class="card-export" onclick="exportCard(this)">📷</button><h3>YoY จำนวน Customer Group (In/In Progress) <small>(คลิก KPI)</small></h3><div id="kpiYoY" class="kpi-row"></div></div>
+  <div class="card" data-name="YoY-Pct"><button class="card-export" onclick="exportCard(this)">📷</button><h3>สัดส่วน % YoY</h3><canvas id="chartYoYPct"></canvas></div>
+  <div class="card" data-name="YoY-Bar"><button class="card-export" onclick="exportCard(this)">📷</button><h3>เปรียบเทียบจำนวน ปีปัจจุบัน–ปีก่อน</h3><canvas id="chartYoYBar"></canvas></div>
+
+  <div class="card full" data-name="1.5"><button class="card-export" onclick="exportCard(this)">📷</button>
+    <h3>1.5 ผลการเปลี่ยน Product Spec (เดิม) → Product (นำเสนอ): Win/Loss/Follow <small>(คลิกตัวเลขในตาราง)</small></h3>
+    <div class="hintbox"><b>In Progress</b> = ยังไม่ตัดสินผล (Sale Status ว่าง/In Progress หรือสถานะโครงการยังดำเนินอยู่)</div>
+    <table id="table15"><thead><tr><th>Customer Group</th><th>Win</th><th>Loss</th><th>Follow</th><th>In Progress</th><th>ตัดสินแล้ว</th><th>ทั้งหมด</th></tr></thead><tbody></tbody></table>
+    <canvas id="chart15" height="110"></canvas></div>
+
+  <div class="card" data-name="WinReason"><button class="card-export" onclick="exportCard(this)">📷</button><h3>➕ เหตุผลที่ชนะ (Win)</h3><canvas id="chartWin"></canvas></div>
+  <div class="card" data-name="SaleGroup"><button class="card-export" onclick="exportCard(this)">📷</button><h3>➕ Sale Status แยกตาม Customer Group</h3><canvas id="chartPlanSale"></canvas></div>
+  <div class="card" data-name="StatusGroup"><button class="card-export" onclick="exportCard(this)">📷</button><h3>➕ Status (In/In Progress) แยกตาม Customer Group</h3><canvas id="chartPlanStatus"></canvas></div>
+
+  <div class="card" data-name="SaleNote"><button class="card-export" onclick="exportCard(this)">📷</button><h3>1. Sale Status / ปัญหาที่พบ <small>(คลิกกราฟ)</small></h3><canvas id="chartSaleNote"></canvas></div>
+  <div class="card" data-name="SaleAction"><button class="card-export" onclick="exportCard(this)">📷</button><h3>Sale Status / In action <small>(คลิกกราฟ)</small></h3><canvas id="chartSaleAction"></canvas></div>
+  <div class="card" data-name="SaleReason"><button class="card-export" onclick="exportCard(this)">📷</button><h3>2. Sale Status / เหตุผล (Win/Loss) <small>(คลิกกราฟ)</small></h3><canvas id="chartSaleReason"></canvas></div>
+  <div class="card" data-name="SaleProductWin"><button class="card-export" onclick="exportCard(this)">📷</button><h3>3. Sale Status / Product Win <small>(คลิกกราฟ)</small></h3><canvas id="chartSaleProdWin"></canvas></div>
+
+  <div class="card full" data-name="ProductWinDetail"><button class="card-export" onclick="exportCard(this)">📷</button>
+    <h3>4. รายละเอียด Product Win <small>(คลิกแถวเพื่อดู/ส่งออก Excel)</small></h3>
+    <table id="tableProdWin"><thead><tr><th>Sale Status</th><th>Product Win</th><th>จำนวนโครงการ</th></tr></thead><tbody></tbody></table></div>
+
+  <div class="card" data-name="StatusProject"><button class="card-export" onclick="exportCard(this)">📷</button><h3>Status Project แยกตาม Customer Group</h3><canvas id="chartStatusProj"></canvas></div>
+  <div class="card" data-name="ProvSales"><button class="card-export" onclick="exportCard(this)">📷</button><h3>ยอดขายรวมแยกจังหวัด (Top 15) <small>(คลิกกราฟ)</small></h3><canvas id="chartProvSales"></canvas></div>
+  <div class="card" data-name="PlanShare"><button class="card-export" onclick="exportCard(this)">📷</button><h3>สัดส่วนจำนวนโครงการตาม Plan</h3><canvas id="chartPlanShare"></canvas></div>
+
+  <div class="card full" data-name="TopCustomers"><button class="card-export" onclick="exportCard(this)">📷</button>
+    <h3>Top 20 ลูกค้ายอดขายสูงสุด <small>(คลิกแถว)</small></h3>
+    <button class="card-btn" onclick="exportTopExcel()">⬇️ Excel (Top 20)</button>
+    <table id="tableTop"><thead><tr><th>อันดับ</th><th>BPNO</th><th>BPName</th><th>Customer Group</th><th>จังหวัด</th><th>ภาค</th><th>ยอดรวม (บาท)</th></tr></thead><tbody></tbody></table></div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">รายละเอียด</h3>
+    <div style="overflow:auto;max-height:60vh"><table class="mtable" id="modalTable"></table></div>
+    <div class="modal-actions">
+      <button onclick="exportModalExcel()">⬇️ ส่งออก Excel</button>
+      <button class="close-x" onclick="document.getElementById('modalBg').style.display='none'">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let RAW=[],PRODUCTS=[],charts={},modalRows=[],modalName='',prodSummary=[],topRowsGlobal=[];
+let selectedProvs=new Set(),selectedGroups=new Set(),selectedProds=new Set(),selectedPlans=new Set(); // ★ เพิ่ม selectedPlans
+const PALETTE=['#2a5298','#2e7d32','#c62828','#f9a825','#6a1b9a','#00838f','#ef6c00','#546e7a','#5d4037','#283593','#ad1457','#0277bd','#7cb342','#8d6e63'];
+const BLANK='__BLANK__';
+
+const norm=s=>(s==null?'':s).toString().replace(/\u00a0/g,' ').trim();
+const low=s=>norm(s).toLowerCase();
+const key=s=>low(s).replace(/[\s_().\-\/]/g,'');
+const num=v=>{const n=parseFloat(norm(v).replace(/,/g,''));return isNaN(n)?0:n;};
+const fmt=n=>Number(n||0).toLocaleString('th-TH',{maximumFractionDigits:0});
+function pick(r,names){const ks=Object.keys(r);for(const nm of names){const nk=key(nm);const f=ks.find(k=>key(k)===nk);if(f!==undefined&&norm(r[f])!=='')return r[f];}return '';}
+function parseDate(v){if(!v&&v!==0)return null;if(v instanceof Date)return isNaN(v)?null:v;
+ if(typeof v==='number'){const p=XLSX.SSF.parse_date_code(v);return p?new Date(p.y,p.m-1,p.d):null;}
+ const d=new Date(norm(v));return isNaN(d)?null:d;}
+const monthKey=d=>d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`:'';
+const yearKey=d=>d?String(d.getFullYear()):'';
+
+/* ---------- ตรรกะสถานะ ---------- */
+function statusCls(v){const s=low(v);if(!s)return '';if(s.includes('progress'))return 'PROG';if(/^in\b/.test(s)||s==='in')return 'IN';return '';}
+const isInRow=r=>statusCls(r.status)==='IN';
+const isProgRow=r=>statusCls(r.status)==='PROG'||statusCls(r.statusProject)==='PROG';
+const isIPRow=r=>isInRow(r)||isProgRow(r);
+function isPendingRow(r){const ss=low(r.saleStatus);
+ if(['win','loss','follow'].includes(ss))return false;
+ if(ss.includes('progress'))return true;
+ return isProgRow(r)||!statusCls(r.status);}
+
+/* ---------- อ่านไฟล์ ---------- */
+document.getElementById('fileInput').addEventListener('change',e=>{
+ const f=e.target.files[0];if(!f)return;
+ const rd=new FileReader();
+ rd.onload=ev=>{
+  try{
+   const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
+   const sh=wb.Sheets[wb.SheetNames[0]];
+   const hdr=(XLSX.utils.sheet_to_json(sh,{header:1,defval:''})[0]||[]).map(norm);
+   const iBP=hdr.findIndex(h=>key(h)==='bpname');
+   const iGT=hdr.findIndex(h=>['grandtotal','total','ยอดรวม','รวม'].includes(key(h)));
+   PRODUCTS=(iBP>=0&&iGT>iBP)?hdr.slice(iBP+1,iGT).filter(Boolean):[];
+   const rows=XLSX.utils.sheet_to_json(sh,{defval:''});
+   RAW=rows.map(r=>{
+    const dv=parseDate(pick(r,['วันที่อัปเดต (Update Date)','Update Date','วันที่อัปเดต']));
+    const products={};let psum=0;
+    PRODUCTS.forEach(p=>{const v=num(r[p]);products[p]=v;psum+=v;});
+    const gt=num(pick(r,['Grand Total','Total','ยอดรวม']));
+    return {date:dv,month:monthKey(dv),year:yearKey(dv),
+     bpno:norm(pick(r,['BPNO','BP NO'])),
+     group:norm(pick(r,['Customer Group'])),province:norm(pick(r,['Province'])),region:norm(pick(r,['Region'])),
+     bpName:norm(pick(r,['BPName','BP Name'])),
+     status:norm(pick(r,['Status (In/In Progress)','Status'])),
+     statusProject:norm(pick(r,['Status Project'])),
+     specOld:norm(pick(r,['Product Spec (เดิม)','Product Spec'])),
+     productNew:norm(pick(r,['Product(นำเสนอ)','Product (นำเสนอ)'])),
+     saleStatus:norm(pick(r,['Sale Status'])),
+     reason:norm(pick(r,['เหตุผล (Win / Loss)','เหตุผล'])),
+     productWin:norm(pick(r,['Product Win'])),
+     note:norm(pick(r,['ปัญหาที่พบ','Note'])),
+     action:norm(pick(r,['In action','In Action'])),
+     remark:norm(pick(r,['หมายเหตุ'])),plan:norm(pick(r,['Plan'])),
+     products,total:gt||psum};
+   }).filter(r=>r.bpName||r.group);
+   if(!RAW.length){alert('ไม่พบข้อมูลในไฟล์');return;}
+   initFilters();render();
+  }catch(err){alert('เกิดปัญหาในการอ่านไฟล์ กรุณาตรวจสอบรูปแบบไฟล์แล้วลองใหม่อีกครั้ง');}
+ };
+ rd.readAsArrayBuffer(f);
+});
+
+/* ---------- ตัวกรอง ---------- */
+function fillSel(id,vals,allowBlank){
+ const el=document.getElementById(id);
+ el.innerHTML='<option value="ALL">ทั้งหมด</option>'+vals.map(v=>`<option>${v}</option>`).join('')+(allowBlank?`<option value="${BLANK}">(ไม่ระบุ / ว่าง)</option>`:'');
+}
+const uniq=k=>[...new Set(RAW.map(r=>r[k]).filter(Boolean))].sort();
+
+function initFilters(){
+ fillSel('regionFilter',uniq('region'));
+ fillSel('statusFilter',uniq('status'),true);
+ fillSel('statusProjFilter',uniq('statusProject'),true);
+ fillSel('specFilter',uniq('specOld'),true);
+ fillSel('prodNewFilter',uniq('productNew'),true);
+ fillSel('saleFilter',uniq('saleStatus'),true);
+ buildProvDrop();buildGroupDrop();buildProdDrop();buildPlanDrop();   // ★
+
+ const months=[...new Set(RAW.map(r=>r.month).filter(Boolean))].sort();
+ const years=[...new Set(RAW.map(r=>r.year).filter(Boolean))].sort();
+ const cm=document.getElementById('curMonth'),pm=document.getElementById('prevMonth'),
+       cy=document.getElementById('curYear'),py=document.getElementById('prevYear');
+ const mo=months.length?months:['-'],yo=years.length?years:['-'];
+ cm.innerHTML=mo.map(m=>`<option>${m}</option>`).join('');
+ pm.innerHTML=mo.map(m=>`<option>${m}</option>`).join('');
+ cy.innerHTML=yo.map(y=>`<option>${y}</option>`).join('');
+ py.innerHTML=yo.map(y=>`<option>${y}</option>`).join('');
+ if(months.length){cm.value=months.at(-1);pm.value=months.at(-2)||months[0];}
+ if(years.length){cy.value=years.at(-1);py.value=years.at(-2)||years[0];}
+
+ ['regionFilter','statusFilter','statusProjFilter','specFilter','prodNewFilter','saleFilter','curMonth','prevMonth','curYear','prevYear']
+  .forEach(id=>document.getElementById(id).onchange=()=>{if(id==='regionFilter'){buildProvDrop();buildGroupDrop();buildPlanDrop();}render();});
+ document.getElementById('bpSearch').oninput=render;
+}
+
+function resetFilters(){
+ ['regionFilter','statusFilter','statusProjFilter','specFilter','prodNewFilter','saleFilter'].forEach(id=>document.getElementById(id).value='ALL');
+ document.getElementById('bpSearch').value='';
+ buildProvDrop();buildGroupDrop();buildProdDrop();buildPlanDrop();   // ★
+ render();
+}
+
+function buildProvDrop(){
+ const reg=document.getElementById('regionFilter').value;
+ const provs=[...new Set(RAW.filter(r=>reg==='ALL'||r.region===reg).map(r=>r.province).filter(Boolean))].sort();
+ selectedProvs.clear();updateBox('provBox',selectedProvs,'ทุกจังหวัด','จังหวัด');
+ document.getElementById('provDrop').innerHTML=
+  `<label style="font-weight:600"><input type="checkbox" id="provAll" checked onchange="toggleAllProv(this)"> ทุกจังหวัด</label><hr style="margin:4px 0;border:none;border-top:1px solid #eee">`+
+  provs.map(p=>`<label><input type="checkbox" class="prov-cb" value="${p}" onchange="updateProv()"> ${p}</label>`).join('');
+}
+function buildGroupDrop(){
+ const reg=document.getElementById('regionFilter').value;
+ const grps=[...new Set(RAW.filter(r=>reg==='ALL'||r.region===reg).map(r=>r.group).filter(Boolean))].sort();
+ selectedGroups.clear();updateBox('groupBox',selectedGroups,'ทุกกลุ่ม','กลุ่ม');
+ document.getElementById('groupDrop').innerHTML=
+  `<label style="font-weight:600"><input type="checkbox" id="grpAll" checked onchange="toggleAllGroup(this)"> ทุกกลุ่ม</label><hr style="margin:4px 0;border:none;border-top:1px solid #eee">`+
+  grps.map(g=>`<label><input type="checkbox" class="grp-cb" value="${g}" onchange="updateGroup()"> ${g}</label>`).join('');
+}
+function buildProdDrop(){
+ selectedProds.clear();updateBox('prodBox',selectedProds,'ทุกสินค้า','สินค้า');
+ document.getElementById('prodDrop').innerHTML=
+  `<label style="font-weight:600"><input type="checkbox" id="prodAll" checked onchange="toggleAllProd(this)"> ทุกสินค้า</label><hr style="margin:4px 0;border:none;border-top:1px solid #eee">`+
+  PRODUCTS.map(p=>`<label><input type="checkbox" class="prod-cb" value="${p}" onchange="updateProd()"> ${p}</label>`).join('');
+}
+/* ★ สร้างรายการ Plan แบบ multi-select */
+function buildPlanDrop(){
+ const reg=document.getElementById('regionFilter').value;
+ const plans=[...new Set(RAW.filter(r=>reg==='ALL'||r.region===reg).map(r=>r.plan).filter(Boolean))].sort();
+ selectedPlans.clear();updateBox('planBox',selectedPlans,'ทุก Plan','Plan');
+ document.getElementById('planDrop').innerHTML=
+  `<label style="font-weight:600"><input type="checkbox" id="planAll" checked onchange="toggleAllPlan(this)"> ทุก Plan</label><hr style="margin:4px 0;border:none;border-top:1px solid #eee">`+
+  plans.map(p=>`<label title="${p}"><input type="checkbox" class="plan-cb" value="${p}" onchange="updatePlan()"> ${p}</label>`).join('')+
+  `<hr style="margin:4px 0;border:none;border-top:1px solid #eee"><label><input type="checkbox" class="plan-cb" value="${BLANK}" onchange="updatePlan()"> (ไม่ระบุ / ว่าง)</label>`;
+}
+
+function toggleDrop(e,id){e.stopPropagation();
+ document.querySelectorAll('.ms-drop').forEach(d=>{if(d.id!==id)d.classList.remove('open');});
+ document.getElementById(id).classList.toggle('open');}
+function toggleAllProv(cb){if(cb.checked){document.querySelectorAll('.prov-cb').forEach(c=>c.checked=false);selectedProvs.clear();}updateBox('provBox',selectedProvs,'ทุกจังหวัด','จังหวัด');render();}
+function toggleAllGroup(cb){if(cb.checked){document.querySelectorAll('.grp-cb').forEach(c=>c.checked=false);selectedGroups.clear();}updateBox('groupBox',selectedGroups,'ทุกกลุ่ม','กลุ่ม');render();}
+function toggleAllProd(cb){if(cb.checked){document.querySelectorAll('.prod-cb').forEach(c=>c.checked=false);selectedProds.clear();}updateBox('prodBox',selectedProds,'ทุกสินค้า','สินค้า');render();}
+function toggleAllPlan(cb){if(cb.checked){document.querySelectorAll('.plan-cb').forEach(c=>c.checked=false);selectedPlans.clear();}updateBox('planBox',selectedPlans,'ทุก Plan','Plan');render();}  // ★
+function updateProv(){const c=[...document.querySelectorAll('.prov-cb:checked')].map(x=>x.value);selectedProvs=new Set(c);document.getElementById('provAll').checked=c.length===0;updateBox('provBox',selectedProvs,'ทุกจังหวัด','จังหวัด');render();}
+function updateGroup(){const c=[...document.querySelectorAll('.grp-cb:checked')].map(x=>x.value);selectedGroups=new Set(c);document.getElementById('grpAll').checked=c.length===0;updateBox('groupBox',selectedGroups,'ทุกกลุ่ม','กลุ่ม');render();}
+function updateProd(){const c=[...document.querySelectorAll('.prod-cb:checked')].map(x=>x.value);selectedProds=new Set(c);document.getElementById('prodAll').checked=c.length===0;updateBox('prodBox',selectedProds,'ทุกสินค้า','สินค้า');render();}
+function updatePlan(){const c=[...document.querySelectorAll('.plan-cb:checked')].map(x=>x.value);selectedPlans=new Set(c);document.getElementById('planAll').checked=c.length===0;updateBox('planBox',selectedPlans,'ทุก Plan','Plan');render();}  // ★
+function updateBox(id,set,allTxt,unit){const b=document.getElementById(id);b.textContent=set.size===0?allTxt:(set.size===1?[...set][0]:`เลือก ${set.size} ${unit}`);b.title=set.size?[...set].join(', '):allTxt;}
+document.addEventListener('click',e=>{if(!e.target.closest('.ms-wrap'))document.querySelectorAll('.ms-drop').forEach(d=>d.classList.remove('open'));});
+
+function matchSel(id,val){const s=document.getElementById(id).value;if(s==='ALL')return true;if(s===BLANK)return !norm(val);return norm(val)===s;}
+/* ★ ตรรกะ Plan แบบหลายค่า */
+function matchPlan(r){if(selectedPlans.size===0)return true;
+ const v=norm(r.plan);
+ return selectedPlans.has(v)||(!v&&selectedPlans.has(BLANK));}
+
+function getFiltered(){
+ const reg=document.getElementById('regionFilter').value;
+ const bp=low(document.getElementById('bpSearch').value);
+ return RAW.filter(r=>
+   (reg==='ALL'||r.region===reg)
+   &&(selectedGroups.size===0||selectedGroups.has(r.group))
+   &&matchPlan(r)                                             // ★
+   &&matchSel('statusFilter',r.status)&&matchSel('statusProjFilter',r.statusProject)
+   &&matchSel('specFilter',r.specOld)&&matchSel('prodNewFilter',r.productNew)&&matchSel('saleFilter',r.saleStatus)
+   &&(selectedProvs.size===0||selectedProvs.has(r.province))
+   &&(!bp||low(r.bpName).includes(bp)||low(r.bpno).includes(bp))
+   &&(selectedProds.size===0||[...selectedProds].some(p=>(r.products[p]||0)>0)));
+}
+const rowTotal=r=>selectedProds.size===0?r.total:[...selectedProds].reduce((s,p)=>s+(r.products[p]||0),0);
+function countBy(rows,k){const m={};rows.forEach(r=>{if(r[k])m[r[k]]=(m[r[k]]||0)+1;});return m;}
+
+/* ---------- กราฟ ---------- */
+function destroy(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+function bar(id,labels,data,label,colors,cb){destroy(id);charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[{label,data,backgroundColor:colors||PALETTE}]},options:{responsive:true,plugins:{legend:{display:false}},onClick:cb||null}});}
+function pie(id,labels,data){destroy(id);charts[id]=new Chart(document.getElementById(id),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:PALETTE}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}}}});}
+function grouped(id,labels,ds,cb){destroy(id);charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}},onClick:cb||null}});}
+function stacked(id,labels,ds,cb){destroy(id);charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:ds},options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true}},plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}},onClick:cb||null}});}
+
+/* ---------- แสดงผล ---------- */
+function render(){
+ if(!RAW.length)return;
+ document.getElementById('hint').style.display='none';
+ document.getElementById('dashboard').style.display='grid';
+ const data=getFiltered();
+ const cur=document.getElementById('curMonth').value,prev=document.getElementById('prevMonth').value;
+ const cy=document.getElementById('curYear').value,py=document.getElementById('prevYear').value;
+
+ const inOnly=data.filter(isInRow);
+ const progOnly=data.filter(r=>!isInRow(r)&&isProgRow(r));
+ const noSt=data.filter(r=>!statusCls(r.status)&&!statusCls(r.statusProject));
+ const ip=data.filter(isIPRow);
+ const ipBase=ip.length?ip:data;
+ const groups=[...new Set(data.map(r=>r.group).filter(Boolean))].sort();
+ const regions=[...new Set(data.map(r=>r.region).filter(Boolean))].sort();
+ const totalG=countBy(ipBase,'group'),curG=countBy(ipBase.filter(r=>r.month===cur),'group'),prevG=countBy(ipBase.filter(r=>r.month===prev),'group');
+
+ /* สรุปผู้บริหาร */
+ const totalSales=data.reduce((s,r)=>s+rowTotal(r),0);
+ const winN=data.filter(r=>low(r.saleStatus)==='win').length,
+       lossN=data.filter(r=>low(r.saleStatus)==='loss').length,
+       followN=data.filter(r=>low(r.saleStatus)==='follow').length;
+ const winRate=(winN+lossN)?((winN/(winN+lossN))*100).toFixed(1):'0.0';
+ const activeProds=PRODUCTS.filter(p=>data.some(r=>(r.products[p]||0)>0));
+ const bk=document.getElementById('bigkpi');
+ bk.innerHTML=`
+  <div class="b" data-k="all"><div class="n">${fmt(data.length)}</div><div class="t">จำนวนลูกค้า/โครงการทั้งหมด</div></div>
+  <div class="b" data-k="sales"><div class="n">${fmt(totalSales)}</div><div class="t">ยอดขายรวม (บาท)</div></div>
+  <div class="b" data-k="prod"><div class="n">${activeProds.length} / ${PRODUCTS.length}</div><div class="t">สินค้าที่มียอดขาย / ทั้งหมด</div></div>
+  <div class="b" data-k="winrate"><div class="n">${winRate}%</div><div class="t">อัตราชนะ (Win/Win+Loss)</div></div>
+  <div class="b" data-k="wlf"><div class="n">${winN} / ${lossN} / ${followN}</div><div class="t">Win / Loss / Follow</div></div>
+  <div class="b" data-k="in"><div class="n">${fmt(inOnly.length)}</div><div class="t">สถานะ In ทั้งหมด</div></div>
+  <div class="b" data-k="prog"><div class="n">${fmt(progOnly.length)}</div><div class="t">สถานะ In Progress ทั้งหมด</div></div>
+  <div class="b gray" data-k="nost"><div class="n">${fmt(noSt.length)}</div><div class="t">ไม่ระบุสถานะ</div></div>`;
+ bk.querySelector('[data-k="all"]').onclick=()=>showModal(data,'รายการทั้งหมดตามตัวกรอง','all');
+ bk.querySelector('[data-k="sales"]').onclick=()=>showModal([...data].sort((a,b)=>rowTotal(b)-rowTotal(a)),'รายการเรียงตามยอดขาย','sales');
+ bk.querySelector('[data-k="prod"]').onclick=()=>showModal(data.filter(r=>PRODUCTS.some(p=>(r.products[p]||0)>0)),'รายการที่มียอดขายสินค้า','hasprod');
+ bk.querySelector('[data-k="winrate"]').onclick=()=>showModal(data.filter(r=>['win','loss'].includes(low(r.saleStatus))),'ฐานคำนวณอัตราชนะ','winrate');
+ bk.querySelector('[data-k="wlf"]').onclick=()=>showModal(data.filter(r=>['win','loss','follow'].includes(low(r.saleStatus))),'รายการตัดสินผล Win/Loss/Follow','wlf');
+ bk.querySelector('[data-k="in"]').onclick=()=>showModal(inOnly,'รายการสถานะ In ทั้งหมด','status_in');
+ bk.querySelector('[data-k="prog"]').onclick=()=>showModal(progOnly,'รายการสถานะ In Progress ทั้งหมด','status_prog');
+ bk.querySelector('[data-k="nost"]').onclick=()=>showModal(noSt,'รายการที่ไม่ระบุสถานะ','status_blank');
+
+ /* สินค้า */
+ prodSummary=PRODUCTS.map(p=>({name:p,sum:data.reduce((s,r)=>s+(r.products[p]||0),0),cnt:data.filter(r=>(r.products[p]||0)>0).length}))
+   .filter(x=>x.sum>0).sort((a,b)=>b.sum-a.sum);
+ bar('chartProducts',prodSummary.map(x=>x.name),prodSummary.map(x=>x.sum),'ยอดขาย (บาท)',PALETTE,
+  (e,els)=>{if(!els.length)return;const p=prodSummary[els[0].index].name;showModal(data.filter(r=>(r.products[p]||0)>0).sort((a,b)=>b.products[p]-a.products[p]),`สินค้า: ${p}`,`prod_${p}`);});
+ const top8=prodSummary.slice(0,8).map(x=>x.name);
+ stacked('chartProdGroup',groups,top8.map((p,i)=>({label:p,data:groups.map(g=>data.filter(r=>r.group===g).reduce((s,r)=>s+(r.products[p]||0),0)),backgroundColor:PALETTE[i%PALETTE.length]})));
+ stacked('chartProdRegion',regions,top8.map((p,i)=>({label:p,data:regions.map(rg=>data.filter(r=>r.region===rg).reduce((s,r)=>s+(r.products[p]||0),0)),backgroundColor:PALETTE[i%PALETTE.length]})));
+ bar('chartRegionSales',regions,regions.map(rg=>data.filter(r=>r.region===rg).reduce((s,r)=>s+rowTotal(r),0)),'ยอดขาย (บาท)',PALETTE,
+  (e,els)=>{if(!els.length)return;const rg=regions[els[0].index];showModal(data.filter(r=>r.region===rg),`ภาค: ${rg}`,`region_${rg}`);});
+ bar('chartGroupSales',groups,groups.map(g=>data.filter(r=>r.group===g).reduce((s,r)=>s+rowTotal(r),0)),'ยอดขาย (บาท)',PALETTE,
+  (e,els)=>{if(!els.length)return;const g=groups[els[0].index];showModal(data.filter(r=>r.group===g),`กลุ่ม: ${g}`,`group_${g}`);});
+
+ /* 1.1 – 1.4 */
+ const kpi=document.getElementById('kpi11');kpi.innerHTML='';
+ groups.forEach(g=>{const c=curG[g]||0,p=prevG[g]||0,d=c-p,cls=d>0?'up':d<0?'down':'flat',s=d>0?'▲ +':d<0?'▼ ':'– ';
+  const div=document.createElement('div');div.className='kpi';
+  div.innerHTML=`<div class="num">${totalG[g]||0}</div><div class="lbl">${g}<br>(เดือนนี้ ${c})</div><div class="delta ${cls}">${s}${Math.abs(d)} เทียบเดือนก่อน</div>`;
+  div.onclick=()=>showModal(ipBase.filter(r=>r.group===g&&r.month===cur),`1.1 ${g} เดือน ${cur}`,`kpi11_${g}`);
+  kpi.appendChild(div);});
+ bar('chart12',groups,groups.map(g=>{const p=prevG[g]||0,c=curG[g]||0;return +(p===0?(c>0?100:0):((c-p)/p*100)).toFixed(1);}),'% เทียบเดือนก่อน',groups.map(g=>((curG[g]||0)-(prevG[g]||0))>=0?'#2e7d32':'#c62828'));
+ grouped('chart13',groups,[{label:'เดือนก่อน ('+prev+')',data:groups.map(g=>prevG[g]||0),backgroundColor:'#90a4ae'},{label:'เดือนปัจจุบัน ('+cur+')',data:groups.map(g=>curG[g]||0),backgroundColor:'#2a5298'}],
+  (e,els)=>{if(!els.length)return;const x=els[0],g=groups[x.index],mm=x.datasetIndex===0?prev:cur;showModal(ipBase.filter(r=>r.group===g&&r.month===mm),`1.3 ${g} ${mm}`,`c13_${g}`);});
+ pie('chart14',groups,groups.map(g=>curG[g]||0));
+
+ /* YoY */
+ const curY=countBy(ipBase.filter(r=>r.year===cy),'group'),prevY=countBy(ipBase.filter(r=>r.year===py),'group');
+ const ky=document.getElementById('kpiYoY');ky.innerHTML='';
+ groups.forEach(g=>{const c=curY[g]||0,p=prevY[g]||0,d=c-p,cls=d>0?'up':d<0?'down':'flat',s=d>0?'▲ +':d<0?'▼ ':'– ';
+  const div=document.createElement('div');div.className='kpi';
+  div.innerHTML=`<div class="num">${c}</div><div class="lbl">${g}<br>(ปี ${cy})</div><div class="delta ${cls}">${s}${Math.abs(d)} เทียบปี ${py}</div>`;
+  div.onclick=()=>showModal(ipBase.filter(r=>r.group===g&&r.year===cy),`YoY ${g} ปี ${cy}`,`yoy_${g}`);
+  ky.appendChild(div);});
+ bar('chartYoYPct',groups,groups.map(g=>{const p=prevY[g]||0,c=curY[g]||0;return +(p===0?(c>0?100:0):((c-p)/p*100)).toFixed(1);}),'% YoY',groups.map(g=>((curY[g]||0)-(prevY[g]||0))>=0?'#2e7d32':'#c62828'));
+ grouped('chartYoYBar',groups,[{label:'ปีก่อน ('+py+')',data:groups.map(g=>prevY[g]||0),backgroundColor:'#90a4ae'},{label:'ปีปัจจุบัน ('+cy+')',data:groups.map(g=>curY[g]||0),backgroundColor:'#1e3c72'}],
+  (e,els)=>{if(!els.length)return;const x=els[0],g=groups[x.index],yy=x.datasetIndex===0?py:cy;showModal(ipBase.filter(r=>r.group===g&&r.year===yy),`YoY ${g} ปี ${yy}`,`yoyb_${g}`);});
+
+ /* 1.5 */
+ const tb=document.querySelector('#table15 tbody');tb.innerHTML='';
+ const wins=[],loss=[],follow=[],pends=[];
+ groups.forEach(g=>{const rows=data.filter(r=>r.group===g);
+  const w=rows.filter(r=>low(r.saleStatus)==='win').length,
+        l=rows.filter(r=>low(r.saleStatus)==='loss').length,
+        fo=rows.filter(r=>low(r.saleStatus)==='follow').length,
+        inp=rows.filter(isPendingRow).length;
+  wins.push(w);loss.push(l);follow.push(fo);pends.push(inp);
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${g}</td><td data-s="win">${w}</td><td data-s="loss">${l}</td><td data-s="follow">${fo}</td><td data-s="pending">${inp}</td><td>${w+l+fo}</td><td data-s="all">${rows.length}</td>`;
+  tr.querySelectorAll('td[data-s]').forEach(td=>td.onclick=()=>drill(data,g,td.dataset.s));
+  tb.appendChild(tr);});
+ grouped('chart15',groups,[{label:'Win',data:wins,backgroundColor:'#2e7d32'},{label:'Loss',data:loss,backgroundColor:'#c62828'},{label:'Follow',data:follow,backgroundColor:'#f9a825'},{label:'In Progress',data:pends,backgroundColor:'#90a4ae'}]);
+
+ const rm={};data.filter(r=>low(r.saleStatus)==='win').forEach(r=>{const k=r.reason||r.productWin||'(ไม่ระบุ)';rm[k]=(rm[k]||0)+1;});
+ bar('chartWin',Object.keys(rm),Object.values(rm),'จำนวน Win',PALETTE);
+
+ const dec=data.filter(r=>['win','loss','follow'].includes(low(r.saleStatus)));
+ stacked('chartPlanSale',groups,[
+  {label:'Win',data:groups.map(g=>dec.filter(r=>r.group===g&&low(r.saleStatus)==='win').length),backgroundColor:'#2e7d32'},
+  {label:'Loss',data:groups.map(g=>dec.filter(r=>r.group===g&&low(r.saleStatus)==='loss').length),backgroundColor:'#c62828'},
+  {label:'Follow',data:groups.map(g=>dec.filter(r=>r.group===g&&low(r.saleStatus)==='follow').length),backgroundColor:'#f9a825'}]);
+ stacked('chartPlanStatus',groups,[
+  {label:'In',data:groups.map(g=>data.filter(r=>r.group===g&&isInRow(r)).length),backgroundColor:'#00838f'},
+  {label:'In Progress',data:groups.map(g=>data.filter(r=>r.group===g&&!isInRow(r)&&isProgRow(r)).length),backgroundColor:'#f9a825'},
+  {label:'ไม่ระบุ',data:groups.map(g=>data.filter(r=>r.group===g&&!statusCls(r.status)&&!statusCls(r.statusProject)).length),backgroundColor:'#cfd8dc'}]);
+
+ renderCross('chartSaleNote',data.filter(r=>r.saleStatus),'note','ปัญหาที่พบ');
+ renderCross('chartSaleAction',data.filter(r=>r.saleStatus),'action','In action');
+ renderCross('chartSaleReason',data.filter(r=>r.saleStatus),'reason','เหตุผล');
+ renderCross('chartSaleProdWin',data.filter(r=>r.saleStatus&&r.productWin),'productWin','Product Win');
+
+ const pw={};data.filter(r=>r.saleStatus&&r.productWin).forEach(r=>{const k=r.saleStatus+'|||'+r.productWin;pw[k]=(pw[k]||0)+1;});
+ const pwtb=document.querySelector('#tableProdWin tbody');pwtb.innerHTML='';
+ const pwKeys=Object.keys(pw).sort();
+ if(!pwKeys.length)pwtb.innerHTML='<tr><td colspan=3>ไม่มีข้อมูล Product Win</td></tr>';
+ pwKeys.forEach(k=>{const[ss,p]=k.split('|||');const tr=document.createElement('tr');tr.className='clk';
+  tr.innerHTML=`<td>${ss}</td><td>${p}</td><td>${pw[k]}</td>`;
+  tr.onclick=()=>showModal(data.filter(r=>r.saleStatus===ss&&r.productWin===p),`Product Win: ${ss} – ${p}`,`pw_${p}`);pwtb.appendChild(tr);});
+
+ const projStatuses=[...new Set(data.map(r=>r.statusProject).filter(Boolean))];
+ stacked('chartStatusProj',groups,projStatuses.map((ps,i)=>({label:ps,data:groups.map(g=>data.filter(r=>r.group===g&&r.statusProject===ps).length),backgroundColor:PALETTE[i%PALETTE.length]})));
+
+ const provSales={};data.forEach(r=>{if(r.province)provSales[r.province]=(provSales[r.province]||0)+rowTotal(r);});
+ const provSorted=Object.entries(provSales).sort((a,b)=>b[1]-a[1]).slice(0,15);
+ bar('chartProvSales',provSorted.map(x=>x[0]),provSorted.map(x=>x[1]),'ยอดขาย (บาท)',PALETTE,
+  (e,els)=>{if(!els.length)return;const pv=provSorted[els[0].index][0];showModal(data.filter(r=>r.province===pv),`จังหวัด: ${pv}`,`prov_${pv}`);});
+
+ const planCnt={};data.forEach(r=>{const k=r.plan||'(ไม่ระบุ)';planCnt[k]=(planCnt[k]||0)+1;});
+ pie('chartPlanShare',Object.keys(planCnt),Object.values(planCnt));
+
+ topRowsGlobal=[...data].sort((a,b)=>rowTotal(b)-rowTotal(a)).slice(0,20);
+ const ttb=document.querySelector('#tableTop tbody');ttb.innerHTML='';
+ if(!topRowsGlobal.length)ttb.innerHTML='<tr><td colspan=7>ไม่มีข้อมูล</td></tr>';
+ topRowsGlobal.forEach((r,i)=>{const tr=document.createElement('tr');tr.className='clk';
+  tr.innerHTML=`<td>${i+1}</td><td>${r.bpno||'-'}</td><td style="text-align:left">${r.bpName}</td><td>${r.group}</td><td>${r.province}</td><td>${r.region}</td><td style="text-align:right">${fmt(rowTotal(r))}</td>`;
+  tr.onclick=()=>showModal([r],`ลูกค้า: ${r.bpName}`,`top_${r.bpno}`);ttb.appendChild(tr);});
+}
+
+function renderCross(id,rows,dim,label){
+ destroy(id);
+ const sales=[...new Set(rows.map(r=>r.saleStatus).filter(Boolean))];
+ const dims=[...new Set(rows.map(r=>norm(r[dim])||'(ไม่ระบุ)'))];
+ const ds=dims.map((d,i)=>({label:d.length>28?d.slice(0,28)+'…':d,_full:d,
+  data:sales.map(s=>rows.filter(r=>r.saleStatus===s&&(norm(r[dim])||'(ไม่ระบุ)')===d).length),
+  backgroundColor:PALETTE[i%PALETTE.length]}));
+ charts[id]=new Chart(document.getElementById(id),{type:'bar',data:{labels:sales,datasets:ds},
+  options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true}},plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:10}}}},
+  onClick:(e,els)=>{if(!els.length)return;const x=els[0],s=sales[x.index],dv=ds[x.datasetIndex]._full;
+   showModal(rows.filter(r=>r.saleStatus===s&&(norm(r[dim])||'(ไม่ระบุ)')===dv),`${s} – ${label}: ${dv}`,`cross_${dim}`);}}});
+}
+
+/* ---------- Modal / Export ---------- */
+const COLS=[['date','วันที่อัปเดต'],['bpno','BPNO'],['bpName','BPName'],['group','Customer Group'],['province','Province'],['region','Region'],
+ ['status','Status (In/In Progress)'],['statusProject','Status Project'],['specOld','Product Spec (เดิม)'],['productNew','Product (นำเสนอ)'],
+ ['saleStatus','Sale Status'],['reason','เหตุผล (Win/Loss)'],['productWin','Product Win'],['note','ปัญหาที่พบ'],['action','In action'],
+ ['remark','หมายเหตุ'],['plan','Plan'],['total','ยอดรวม (บาท)']];
+function cellVal(r,k){if(k==='date'){const d=parseDate(r.date);return d?d.toLocaleDateString('th-TH'):'';}if(k==='total')return rowTotal(r);return r[k]||'';}
+
+function showModal(rows,title,name){
+ modalRows=rows;modalName=name||'detail';
+ document.getElementById('modalTitle').textContent=`${title} (${rows.length} รายการ)`;
+ let h='<thead><tr>'+COLS.map(c=>`<th>${c[1]}</th>`).join('')+'</tr></thead><tbody>';
+ if(!rows.length)h+=`<tr><td colspan="${COLS.length}">ไม่มีข้อมูล</td></tr>`;
+ rows.forEach(r=>{h+='<tr>'+COLS.map(c=>`<td>${c[0]==='total'?fmt(cellVal(r,c[0])):cellVal(r,c[0])}</td>`).join('')+'</tr>';});
+ document.getElementById('modalTable').innerHTML=h+'</tbody>';
+ document.getElementById('modalBg').style.display='flex';
+}
+function drill(data,g,mode){
+ const base=data.filter(r=>r.group===g);let rows=base,txt=g;
+ if(mode==='win'){rows=base.filter(r=>low(r.saleStatus)==='win');txt=g+' – Win';}
+ else if(mode==='loss'){rows=base.filter(r=>low(r.saleStatus)==='loss');txt=g+' – Loss';}
+ else if(mode==='follow'){rows=base.filter(r=>low(r.saleStatus)==='follow');txt=g+' – Follow';}
+ else if(mode==='pending'){rows=base.filter(isPendingRow);txt=g+' – In Progress';}
+ showModal(rows,`รายละเอียด: ${txt}`,`${g}_${mode}`);
+}
+function aoaFrom(rows){const head=COLS.map(c=>c[1]).concat(PRODUCTS);const aoa=[head];
+ rows.forEach(r=>aoa.push(COLS.map(c=>cellVal(r,c[0])).concat(PRODUCTS.map(p=>r.products[p]||0))));return aoa;}
+function saveWb(aoa,sheet,file){const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),sheet);XLSX.writeFile(wb,file);}
+function exportModalExcel(){if(!modalRows.length){alert('ไม่มีข้อมูลให้ส่งออก');return;}saveWb(aoaFrom(modalRows),'Detail',`detail_${modalName}_${new Date().toISOString().slice(0,10)}.xlsx`);}
+function exportTopExcel(){if(!topRowsGlobal.length){alert('ไม่มีข้อมูลให้ส่งออก');return;}saveWb(aoaFrom(topRowsGlobal),'Top20',`top20_${new Date().toISOString().slice(0,10)}.xlsx`);}
+function exportProdExcel(){if(!prodSummary.length){alert('ไม่มีข้อมูลให้ส่งออก');return;}
+ const aoa=[['สินค้า','ยอดขายรวม','จำนวนลูกค้า','สัดส่วน %']];
+ const tot=prodSummary.reduce((s,x)=>s+x.sum,0);
+ prodSummary.forEach(x=>aoa.push([x.name,x.sum,x.cnt,tot?+(x.sum/tot*100).toFixed(2):0]));
+ saveWb(aoa,'Products',`products_${new Date().toISOString().slice(0,10)}.xlsx`);}
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')e.currentTarget.style.display='none';});
+
+function exportImage(){html2canvas(document.getElementById('dashboard'),{scale:3,backgroundColor:'#f0f2f5'}).then(c=>{const a=document.createElement('a');a.download='dashboard_all_'+new Date().toISOString().slice(0,10)+'.png';a.href=c.toDataURL('image/png');a.click();});}
+function exportCard(btn){const card=btn.closest('.card');btn.style.visibility='hidden';
+ html2canvas(card,{scale:3,backgroundColor:'#ffffff'}).then(c=>{btn.style.visibility='visible';const a=document.createElement('a');a.download='card_'+(card.dataset.name||'chart')+'_'+new Date().toISOString().slice(0,10)+'.png';a.href=c.toDataURL('image/png');a.click();});}
+</script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
